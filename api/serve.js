@@ -139,6 +139,20 @@ app.get('/api/:id', function(req, res){
     });
 });
 
+app.get('/imagens/:imagem', function(req, res){
+    var img = req.params.imagem;
+    
+    fs.readFile('./uploads/'+img, function(err, content){
+        if(err){
+            res.status(400).json(err);
+            return 
+        }
+
+        res.writeHead(200, {'Content-type' : 'image/jpg'});
+        res.end(content);
+    })
+})
+
 // PUT by ID(update)
 app.put('/api/:id', function(req, res){
     db.open(function(err, mongoclient){
