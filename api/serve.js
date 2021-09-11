@@ -2,8 +2,9 @@ var express = require('express'),
     bodyParser = require('body-parser'),
     multiparty = require('connect-multiparty'),
     mongodb = require('mongodb'),
-    objectId = require('mongodb').ObjectID;
-
+    objectId = require('mongodb').ObjectID,
+    fs = require('fs'),
+    fsx = require('fs-extra');
 
 var app = express();
 
@@ -33,22 +34,74 @@ app.post('/api', function(req, res){
 
     res.setHeader("Access-Control-Allow-Origin", "*");
 
-    var dados = req.body;
+    var date = new Date();
+    var time_stamp = date.getTime();
 
-    res.send(dados);
+    var url_imagem = time_stamp + '_' + req.files.arquivo.originalFilename;
+    var path_origem = req.files.arquivo.path;
+    var path_destino = './uploads/' + url_imagem;
 
-    /*db.open(function(err, mongoclient){
-        mongoclient.collection('postagens', function(err, collection){
-            collection.insert(dados, function(err, records){
-                if(err){
-                    res.json({'status': 'erro'});
-                }else{
-                    res.json({'status': 'inclusao realizada com sucesso'});
-                }
-                mongoclient.close();
+    fsx.move(path_origem, path_destino, function(err){
+        if (err) {
+         res.status(500).json({error: err});
+         return;
+        }
+
+        var dados = {
+            url_imagem: url_imagem,
+            titulo: req.body.titulo
+        }
+
+        db.open(function(err, mongoclient){
+            mongoclient.collection('postagens', function(err, collection){
+                collection.insert(dados, function(err, records){
+                    if(err){
+                        res.json({'status': 'erro'});
+                    }else{
+                        res.json({'status': 'inclusao realizada com sucesso'});
+                    }
+                    mongoclient.close();
+                });
             });
         });
-    });*/
+
+    });
+});
+
+// POST(create)
+app.post('/api', function(req, res){
+
+    res.setHeader("Access-Control-Allow-Origin", "*");
+
+    var path_origem = req.files.arquivo.path;
+    var path_destino = './uploads/' + req.files.arquivo.originalFilename;
+
+    var url_imagem = req.files.arquivo.originalFilename;
+
+    fs.rename(path_origem, path_destino, function(err){
+        if(err){
+            res.status(500).json({error: err});
+            return;
+        }
+
+        var dados = {
+            url_imagem: url_imagem,
+            titulo: req.body.titulo
+        }
+        db.open(function(err, mongoclient){
+            mongoclient.collection('postagens', function(err, collection){
+                collection.insert(dados, function(err, records){
+                    if(err){
+                        res.json({'status': 'erro'});
+                    }else{
+                        res.json({'status': 'inclusao realizada com sucesso'});
+                    }
+                    mongoclient.close();
+                });
+            });
+        });
+    });
+
 });
 
 // GET(ready)
