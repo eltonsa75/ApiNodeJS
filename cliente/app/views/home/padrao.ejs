@@ -51,7 +51,9 @@
 								xhr.setRequestHeader('Content-Type', 'application/json');
 
 								xhr.onload = function(){
-									alert(xhr.responseText);
+									if(xhr.status === 200){
+										window.location.href = '/home'
+									}
 								}
 
 								// a função JSON.stringify tranforma o objeto em String
