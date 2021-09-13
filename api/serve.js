@@ -13,6 +13,16 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
 app.use(multiparty());
 
+app.use(function(req, res, next){
+
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+    res.setHeader("Access-Control-Allow-Headers", "content-type");
+    res.setHeader("Access-Control-Allow-Credentials", true);
+
+    next();
+});
+
 var port = 8080;
 
 app.listen(port);
@@ -31,8 +41,6 @@ app.get('/', function(req, res){
 
 // POST(create)
 app.post('/api', function(req, res){
-
-    res.setHeader("Access-Control-Allow-Origin", "*");
 
     var date = new Date();
     var time_stamp = date.getTime();
@@ -70,9 +78,6 @@ app.post('/api', function(req, res){
 
 // POST(create)
 app.post('/api', function(req, res){
-
-    res.setHeader("Access-Control-Allow-Origin", "*");
-
     var path_origem = req.files.arquivo.path;
     var path_destino = './uploads/' + req.files.arquivo.originalFilename;
 
@@ -107,7 +112,6 @@ app.post('/api', function(req, res){
 // GET(ready)
 app.get('/api', function(req, res){
 
-    res.setHeader("Access-Control-Allow-Origin", "*");
 
     db.open(function(err, mongoclient){
         mongoclient.collection('postagens', function(err, collection){
@@ -155,6 +159,8 @@ app.get('/imagens/:imagem', function(req, res){
 
 // PUT by ID(update)
 app.put('/api/:id', function(req, res){
+    res.send('rota para atualização');
+    /*
     db.open(function(err, mongoclient){
         mongoclient.collection('postagens', function(err, collection){
             collection.update(
@@ -172,6 +178,7 @@ app.put('/api/:id', function(req, res){
             );
         });
     });
+    */
 });
 
 // DELETE by ID(delete)
